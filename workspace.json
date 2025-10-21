@@ -1,0 +1,266 @@
+{
+  "configuration" : {
+    "scope" : "SoftwareSystem"
+  },
+  "description" : "Arquitectura general del sistema web de VÜS",
+  "documentation" : {
+    "decisions" : [ {
+      "content" : "# ADR: Uso de Angular frente a React\nDate: 2025-09-01\n## Status\nAccepted\n\n**Context**:\nSe eval­uaron diferentes frameworks para construir la interfaz web de nuestro e-commerce. Las opciones contempladas fueron Angular, React y Vue.js. Buscábamos un framework robusto con ecosistema completo (formularios, routing, SSR) y mantenible por un equipo creciente.\n\n**Decision Drivers**:\n- Ecosistema TypeScript unificado\n- Soporte corporativo sólido\n- Necesidad de arquitectura escalable basada en componentes\n\n**Considered Alternatives**:\n- React\n- Vue.js\n\n**Decision**:\nSe selecciona Angular como framework principal para el frontend.\n\n**Rationale**:\nAngular ofrece una arquitectura más estructurada con inyección de dependencias, módulos claros, soporte nativo para routing y validación de formularios. Esto reduce la necesidad de múltiples librerías externas, favorece la mantenibilidad a largo plazo y mejora la coherencia del equipo.\n**Ventajas**: mayor consistencia, buen soporte, reducción de “glue-code”.\n**Desventajas**: curva de aprendizaje más alta, mayor “peso” inicial, menos flexibilidad que React en algunos casos.\n\n**Consequences**:\n- Desarrollo inicial puede ser más lento debido a la curva de aprendizaje.\n- Mejora de la mantenibilidad y escalabilidad del frontend.\n- Cierta sobrecarga si el proyecto se queda muy pequeño o simple.\n\n**Related Decisions**:\n(ninguna en este momento)\n",
+      "date" : "2025-09-01T00:00:00Z",
+      "format" : "Markdown",
+      "id" : "1",
+      "status" : "Accepted",
+      "title" : " ADR: Uso de Angular frente a React"
+    }, {
+      "content" : "# ADR: Uso de Google Cloud Storage (GCS) para almacenamiento de imágenes de productos\n\nDate: 2025-09-01\n## Status\nAccepted\n\n**Context**:\nEl e-commerce requiere un servicio para almacenar imágenes de productos que puedan ser servidas eficientemente, con buena latencia para Uruguay/Sudamérica, escalabilidad y coste bajo en inicio. Se evaluaron alternativas: AWS S3, Cloudinary, Firebase Storage.\n\n**Decision Drivers**:\n- Costo reducido para almacenar gran cantidad de imágenes\n- Disponibilidad global y buen rendimiento desde región\n- Integración con SDKs de NodeJS y Angular\n\n**Considered Alternatives**:\n- AWS S3\n- Cloudinary\n- Firebase Storage\n\n**Decision**:\nUtilizar Google Cloud Storage (GCS) para almacenar las imágenes de productos en un bucket con control de acceso y generación de URLs públicas temporales desde el backend.\n\n**Rationale**:\nGCS ofrece capa gratuita hasta ~20 GB/mes (varía según región) y buena latencia desde Sudamérica, con SDKs oficiales que facilitan la integración. Se reduce el coste inicial y se acelera la puesta en marcha.\n**Ventajas**: coste de entrada bajo, confianza en infraestructura de Google, buena latencia regional, integración simple.\n**Desventajas**: dependencia de proveedor, posible escalado de coste con mayor tráfico, menor variedad de funcionalidades especializadas vs servicios especializados.\n\n**Consequences**:\n- Implementación más rápida y coste inicial bajo.\n- Al crecer el tráfico o volumen de almacenamiento puede incrementarse el coste y requerir revisión de proveedor.\n- Depende de la disponibilidad del servicio de Google Cloud (aunque es alta) y de los acuerdos de nivel de servicio.\n\n**Related Decisions**:\n(ninguna en este momento)\n",
+      "date" : "2025-09-01T00:00:00Z",
+      "format" : "Markdown",
+      "id" : "3",
+      "status" : "Accepted",
+      "title" : " ADR: Uso de Google Cloud Storage (GCS) para almacenamiento de imágenes de productos"
+    } ],
+    "sections" : [ {
+      "content" : "# VÜS E-commerce\n\n## Visión general\nEl sistema VÜS E-commerce es la plataforma web de venta de indumentaria de la marca VÜS. Permite a los usuarios navegar por catálogos de productos, registrarse, iniciar sesión, comprar productos, y ver sus pedidos.\n\n## Contexto del negocio\n• Marca VÜS con presencia online y física.\n• Objetivo: ampliar canal online, ofrecer catálogo actualizado con imágenes de productos, escalabilidad ante picos de tráfico.\n• Usuario objetivo: consumidor final de indumentaria, espera experiencia rápida, intuitiva, y disponibilidad 24×7.\n\n## Arquitectura de alto nivel\nEl sistema está compuesto por:\n- Frontend desarrollado en Angular (SPA).\n- Backend en NodeJS + Express, expone API REST.\n- Base de datos MongoDB (con Mongoose) para productos, usuarios, pedidos.\n- Almacenamiento de imágenes en Google Cloud Storage (GCS) para productos.\nLuego de iniciar sesión, el usuario envía solicitudes al backend, que accede a la base de datos y al almacenamiento de imágenes, tal como se muestra en el diagrama de contenedores.\n\n## Decisiones arquitectónicas\nLas decisiones clave están documentadas en los ADRs (Architecture Decision Records). Véase carpeta `decisions/` para Angular vs React, MongoDB+Mongoose, GCS, etc.\n\n## Tecnologías & criterios de calidad\n- Angular 20 / TypeScript para frontend.\n- NodeJS 18 + Express para backend.\n- MongoDB 6.x + Mongoose para ODM.\n- Google Cloud Storage para activos multimedia.\n**Criterios:**\n  - Escalabilidad horizontal (uso de MongoDB, almacenamiento en la nube).\n  - Mantenibilidad (estructura modular, código TypeScript).\n  - Rendimiento (uso de CDN, almacenamiento externo de imágenes).\n  - Seguridad (autenticación JWT, HTTPS, control de acceso a buckets).\n\n## Dependencias externas\n- Servicio de pago/ordenes externas (por definir).\n- Google Cloud Platform para almacenamiento y posiblemente hosting.\n- CRM o sistema de inventario físico (sincronización futura).\n\n## Operaciones / despliegue\n- Entornos: **dev**, **staging**, **prod**.\n- Despliegue en contenedores (Docker) o Kubernetes (planificado).\n- Backup de MongoDB diario, replicación geo-regional.\n- Monitoreo con métricas de respuesta del API, tasa de errores, latencia de almacenamiento de objetos.\n\n## Modelo C4 y diagramas\n- System Context: usuarios, sistema VÜS E-commerce.\n- Container: frontend, backend, base de datos, almacenamiento de imágenes.\n- Component: en backend los módulos de controladores, servicios, modelos (Mongoose).\nLos diagramas están disponibles en Structurizr Lite, o exportables en SVG/PNG.\n\n## Contribuir / mantenimiento\n- El repositorio contiene:\n  - `workspace.dsl`: definición del modelo + vistas.\n  - Carpeta `docs/`: documentación Markdown.\n  - Carpeta `decisions/`: ADRs en Markdown.\n- Para contribuir: editá la documentación o los diagramas, guardá, refrescá en Structurizr Lite y confirma que se visualiza correctamente.\n- Las decisiones arquitectónicas deben documentarse creando un nuevo archivo ADR numerado secuencialmente en `decisions/`.\n\n",
+      "filename" : "system-overview.md",
+      "format" : "Markdown",
+      "order" : 1,
+      "title" : ""
+    } ]
+  },
+  "id" : 1,
+  "lastModifiedAgent" : "structurizr-ui",
+  "lastModifiedDate" : "2025-10-21T20:15:33Z",
+  "model" : {
+    "people" : [ {
+      "description" : "Cliente que navega el sitio y realiza compras online.",
+      "id" : "1",
+      "location" : "Unspecified",
+      "name" : "Usuario",
+      "properties" : {
+        "structurizr.dsl.identifier" : "user"
+      },
+      "relationships" : [ {
+        "description" : "Navega el sitio y realiza operaciones (compras, registro, login)",
+        "destinationId" : "3",
+        "id" : "7",
+        "sourceId" : "1",
+        "tags" : "Relationship"
+      }, {
+        "description" : "Navega el sitio y realiza operaciones (compras, registro, login)",
+        "destinationId" : "2",
+        "id" : "8",
+        "linkedRelationshipId" : "7",
+        "sourceId" : "1"
+      } ],
+      "tags" : "Element,Person"
+    } ],
+    "softwareSystems" : [ {
+      "containers" : [ {
+        "description" : "Interfaz web SPA que muestra los productos, permite registrarse, iniciar sesión y comprar.",
+        "documentation" : { },
+        "id" : "3",
+        "name" : "Frontend Angular",
+        "properties" : {
+          "structurizr.dsl.identifier" : "vus.web"
+        },
+        "relationships" : [ {
+          "description" : "Envía solicitudes HTTP (REST API)",
+          "destinationId" : "4",
+          "id" : "9",
+          "sourceId" : "3",
+          "tags" : "Relationship"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : "Angular / TypeScript"
+      }, {
+        "description" : "API REST que maneja la lógica de negocio y expone endpoints para el frontend.",
+        "documentation" : {
+          "decisions" : [ {
+            "content" : "# ADR: Uso de MongoDB con Mongoose para la capa de persistencia\n\nDate: 2025-09-01\n## Status\nAccepted\n\n**Context**:\nEl sistema de e-commerce necesita almacenar productos, usuarios, pedidos y variantes de productos. Se espera que la estructura de los ítems evolucione (por ejemplo, nuevos campos en productos) y que la carga crezca horizontalmente.\n\n**Decision Drivers**:\n- Flexibilidad del modelo de datos\n- Escalabilidad horizontal\n- Integración natural con NodeJS\n\n**Considered Alternatives**:\n- PostgreSQL\n- MySQL\n\n**Decision**:\nAdoptar MongoDB como base de datos NoSQL, utilizando Mongoose como ODM (Object Data Modeling) para facilitar la definición de esquemas, validaciones y consulta desde NodeJS.\n\n**Rationale**:\nMongoose proporciona una capa intuitiva sobre MongoDB permitiendo definir esquemas dinámicos sin perder control. La combinación con NodeJS (JavaScript/TypeScript) resulta fluida, con intercambio de JSON de extremo a extremo. Se gana velocidad de desarrollo y capacidad de adaptación.\n**Ventajas**: modelo de datos flexible, rápido onboarding, escalabilidad horizontal.\n**Desventajas**: no hay relaciones tan estrictas como en SQL, las consultas complejas pueden requerir agregaciones adicionales, menos familiar para equipos acostumbrados a SQL.\n\n**Consequences**:\n- Flexibilidad y velocidad de desarrollo aumentadas.\n- Menor rigidez en integridad referencial (se debe prestar atención al diseño).\n- En casos muy complejos de relaciones, puede requerir mayor esfuerzo de consulta.\n\n**Related Decisions**:\n(ninguna en este momento)\n",
+            "date" : "2025-09-01T00:00:00Z",
+            "format" : "Markdown",
+            "id" : "2",
+            "status" : "Accepted",
+            "title" : " ADR: Uso de MongoDB con Mongoose para la capa de persistencia"
+          } ]
+        },
+        "id" : "4",
+        "name" : "Backend NodeJS + Express",
+        "properties" : {
+          "structurizr.dsl.identifier" : "vus.api"
+        },
+        "relationships" : [ {
+          "description" : "Lee y escribe datos de productos, usuarios y pedidos",
+          "destinationId" : "5",
+          "id" : "10",
+          "sourceId" : "4",
+          "tags" : "Relationship"
+        }, {
+          "description" : "Obtiene URLs o sube imágenes de productos",
+          "destinationId" : "6",
+          "id" : "11",
+          "sourceId" : "4",
+          "tags" : "Relationship"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : "NodeJS / Express"
+      }, {
+        "description" : "Base de datos NoSQL que almacena los productos, usuarios y pedidos.",
+        "documentation" : { },
+        "id" : "5",
+        "name" : "MongoDB",
+        "properties" : {
+          "structurizr.dsl.identifier" : "vus.db"
+        },
+        "relationships" : [ {
+          "description" : "Guarda referencias a imágenes (URLs) de productos",
+          "destinationId" : "6",
+          "id" : "12",
+          "sourceId" : "5",
+          "tags" : "Relationship"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : "MongoDB + Mongoose"
+      }, {
+        "description" : "Almacén de imágenes de productos (bucket en Google Cloud Platform).",
+        "documentation" : { },
+        "id" : "6",
+        "name" : "Google Cloud Storage",
+        "properties" : {
+          "structurizr.dsl.identifier" : "vus.gcs"
+        },
+        "tags" : "Element,Container",
+        "technology" : "GCS"
+      } ],
+      "description" : "Sistema de venta online de indumentaria desarrollado por VÜS.",
+      "documentation" : { },
+      "id" : "2",
+      "location" : "Unspecified",
+      "name" : "VÜS E-commerce",
+      "properties" : {
+        "structurizr.dsl.identifier" : "vus"
+      },
+      "tags" : "Element,Software System"
+    } ]
+  },
+  "name" : "VUS E-commerce",
+  "properties" : {
+    "structurizr.dsl" : "d29ya3NwYWNlICJWVVMgRS1jb21tZXJjZSIgIkFycXVpdGVjdHVyYSBnZW5lcmFsIGRlbCBzaXN0ZW1hIHdlYiBkZSBWw5xTIiB7CgogICAgIWlkZW50aWZpZXJzIGhpZXJhcmNoaWNhbAoKICAgIG1vZGVsIHsKICAgICAgICB1c2VyID0gcGVyc29uICJVc3VhcmlvIiAiQ2xpZW50ZSBxdWUgbmF2ZWdhIGVsIHNpdGlvIHkgcmVhbGl6YSBjb21wcmFzIG9ubGluZS4iCgogICAgICAgIHZ1cyA9IHNvZnR3YXJlU3lzdGVtICJWw5xTIEUtY29tbWVyY2UiICJTaXN0ZW1hIGRlIHZlbnRhIG9ubGluZSBkZSBpbmR1bWVudGFyaWEgZGVzYXJyb2xsYWRvIHBvciBWw5xTLiIgewoKICAgICAgICAgICAgd2ViID0gY29udGFpbmVyICJGcm9udGVuZCBBbmd1bGFyIiAiSW50ZXJmYXogd2ViIFNQQSBxdWUgbXVlc3RyYSBsb3MgcHJvZHVjdG9zLCBwZXJtaXRlIHJlZ2lzdHJhcnNlLCBpbmljaWFyIHNlc2nDs24geSBjb21wcmFyLiIgIkFuZ3VsYXIgLyBUeXBlU2NyaXB0IgogICAgICAgICAgICBhcGkgPSBjb250YWluZXIgIkJhY2tlbmQgTm9kZUpTICsgRXhwcmVzcyIgIkFQSSBSRVNUIHF1ZSBtYW5lamEgbGEgbMOzZ2ljYSBkZSBuZWdvY2lvIHkgZXhwb25lIGVuZHBvaW50cyBwYXJhIGVsIGZyb250ZW5kLiIgIk5vZGVKUyAvIEV4cHJlc3MiIHsKICAgICAgICAgICAgICAgICFhZHJzIGRlY2lzaW9ucy9hcGktYWRycwogICAgICAgICAgICB9CiAgICAgICAgICAgIGRiID0gY29udGFpbmVyICJNb25nb0RCIiAiQmFzZSBkZSBkYXRvcyBOb1NRTCBxdWUgYWxtYWNlbmEgbG9zIHByb2R1Y3RvcywgdXN1YXJpb3MgeSBwZWRpZG9zLiIgIk1vbmdvREIgKyBNb25nb29zZSIKICAgICAgICAgICAgZ2NzID0gY29udGFpbmVyICJHb29nbGUgQ2xvdWQgU3RvcmFnZSIgIkFsbWFjw6luIGRlIGltw6FnZW5lcyBkZSBwcm9kdWN0b3MgKGJ1Y2tldCBlbiBHb29nbGUgQ2xvdWQgUGxhdGZvcm0pLiIgIkdDUyIKCiAgICAgICAgICAgIHVzZXIgLT4gd2ViICJOYXZlZ2EgZWwgc2l0aW8geSByZWFsaXphIG9wZXJhY2lvbmVzIChjb21wcmFzLCByZWdpc3RybywgbG9naW4pIgogICAgICAgICAgICB3ZWIgLT4gYXBpICJFbnbDrWEgc29saWNpdHVkZXMgSFRUUCAoUkVTVCBBUEkpIgogICAgICAgICAgICBhcGkgLT4gZGIgIkxlZSB5IGVzY3JpYmUgZGF0b3MgZGUgcHJvZHVjdG9zLCB1c3VhcmlvcyB5IHBlZGlkb3MiCiAgICAgICAgICAgIGFwaSAtPiBnY3MgIk9idGllbmUgVVJMcyBvIHN1YmUgaW3DoWdlbmVzIGRlIHByb2R1Y3RvcyIKICAgICAgICAgICAgZGIgLT4gZ2NzICJHdWFyZGEgcmVmZXJlbmNpYXMgYSBpbcOhZ2VuZXMgKFVSTHMpIGRlIHByb2R1Y3RvcyIKICAgICAgICB9CiAgICB9CgogICAgdmlld3MgewogICAgICAgIHN5c3RlbUNvbnRleHQgdnVzIGNvbnRleHRvX3Npc3RlbWEgewogICAgICAgICAgICB0aXRsZSAiQ29udGV4dG8gZGVsIHNpc3RlbWEiCiAgICAgICAgICAgIGluY2x1ZGUgdXNlcgogICAgICAgICAgICBpbmNsdWRlIHZ1cwogICAgICAgICAgICBhdXRvbGF5b3V0IGxyCiAgICAgICAgfQoKICAgICAgICBjb250YWluZXIgdnVzIHZpc3RhX2NvbnRlbmVkb3JlcyB7CiAgICAgICAgICAgIHRpdGxlICJWaXN0YSBkZSBjb250ZW5lZG9yZXMiCiAgICAgICAgICAgIGluY2x1ZGUgdXNlcgogICAgICAgICAgICBpbmNsdWRlICoKICAgICAgICAgICAgYXV0b2xheW91dCBscgogICAgICAgIH0KCiAgICAgICAgc3R5bGVzIHsKICAgICAgICAgICAgZWxlbWVudCAiUGVyc29uIiB7CiAgICAgICAgICAgICAgICBzaGFwZSBwZXJzb24KICAgICAgICAgICAgICAgIGJhY2tncm91bmQgIzE2OEY1RAogICAgICAgICAgICAgICAgY29sb3IgI2ZmZmZmZgogICAgICAgICAgICB9CiAgICAgICAgICAgIGVsZW1lbnQgIlNvZnR3YXJlIFN5c3RlbSIgewogICAgICAgICAgICAgICAgYmFja2dyb3VuZCAjMUVCQTc5CiAgICAgICAgICAgICAgICBjb2xvciAjZmZmZmZmCiAgICAgICAgICAgIH0KICAgICAgICAgICAgZWxlbWVudCAiQ29udGFpbmVyIiB7CiAgICAgICAgICAgICAgICBiYWNrZ3JvdW5kICMyNEQ5OUEKICAgICAgICAgICAgICAgIGNvbG9yICMwMDAwMDAKICAgICAgICAgICAgfQogICAgICAgICAgICBlbGVtZW50ICJEYXRhYmFzZSIgewogICAgICAgICAgICAgICAgc2hhcGUgY3lsaW5kZXIKICAgICAgICAgICAgICAgIGJhY2tncm91bmQgIzFFOTBGRgogICAgICAgICAgICAgICAgY29sb3IgI2ZmZmZmZgogICAgICAgICAgICB9CiAgICAgICAgfQogICAgfQoKICAgIGNvbmZpZ3VyYXRpb24gewogICAgICAgIHNjb3BlIHNvZnR3YXJlc3lzdGVtCiAgICB9CgogICAgIWFkcnMgZGVjaXNpb25zCgogICAgIWRvY3MgZG9jcwoKfQ=="
+  },
+  "views" : {
+    "configuration" : {
+      "branding" : { },
+      "lastSavedView" : "vista_contenedores",
+      "metadataSymbols" : "SquareBrackets",
+      "styles" : {
+        "elements" : [ {
+          "background" : "#168f5d",
+          "color" : "#ffffff",
+          "shape" : "Person",
+          "tag" : "Person"
+        }, {
+          "background" : "#1eba79",
+          "color" : "#ffffff",
+          "tag" : "Software System"
+        }, {
+          "background" : "#24d99a",
+          "color" : "#000000",
+          "tag" : "Container"
+        }, {
+          "background" : "#1e90ff",
+          "color" : "#ffffff",
+          "shape" : "Cylinder",
+          "tag" : "Database"
+        } ]
+      },
+      "terminology" : { }
+    },
+    "containerViews" : [ {
+      "automaticLayout" : {
+        "applied" : true,
+        "edgeSeparation" : 0,
+        "implementation" : "Graphviz",
+        "nodeSeparation" : 300,
+        "rankDirection" : "LeftRight",
+        "rankSeparation" : 300,
+        "vertices" : false
+      },
+      "dimensions" : {
+        "height" : 995,
+        "width" : 3820
+      },
+      "elements" : [ {
+        "id" : "1",
+        "x" : 200,
+        "y" : 165
+      }, {
+        "id" : "3",
+        "x" : 900,
+        "y" : 215
+      }, {
+        "id" : "4",
+        "x" : 1650,
+        "y" : 215
+      }, {
+        "id" : "5",
+        "x" : 2400,
+        "y" : 369
+      }, {
+        "id" : "6",
+        "x" : 3150,
+        "y" : 215
+      } ],
+      "externalSoftwareSystemBoundariesVisible" : false,
+      "key" : "vista_contenedores",
+      "order" : 2,
+      "relationships" : [ {
+        "id" : "10"
+      }, {
+        "id" : "11",
+        "vertices" : [ {
+          "x" : 2400,
+          "y" : 219
+        }, {
+          "x" : 2850,
+          "y" : 219
+        } ]
+      }, {
+        "id" : "12"
+      }, {
+        "id" : "7"
+      }, {
+        "id" : "9"
+      } ],
+      "softwareSystemId" : "2",
+      "title" : "Vista de contenedores"
+    } ],
+    "systemContextViews" : [ {
+      "automaticLayout" : {
+        "applied" : false,
+        "edgeSeparation" : 0,
+        "implementation" : "Graphviz",
+        "nodeSeparation" : 300,
+        "rankDirection" : "LeftRight",
+        "rankSeparation" : 300,
+        "vertices" : false
+      },
+      "elements" : [ {
+        "id" : "1",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "2",
+        "x" : 0,
+        "y" : 0
+      } ],
+      "enterpriseBoundaryVisible" : true,
+      "key" : "contexto_sistema",
+      "order" : 1,
+      "relationships" : [ {
+        "id" : "8"
+      } ],
+      "softwareSystemId" : "2",
+      "title" : "Contexto del sistema"
+    } ]
+  }
+}

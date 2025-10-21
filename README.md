@@ -1,25 +1,22 @@
-# 🧱 VÜS E-commerce – Arquitectura con Structurizr Lite
+# VÜS – Arquitectura con Structurizr Lite
 
-Este repositorio documenta la arquitectura del sistema **VÜS E-commerce**, modelada con **Structurizr Lite** siguiendo el enfoque *Architecture as Code*.  
-El proyecto forma parte del curso **Taller de Evaluación de Tecnologías de la Información** (Facultad de Ingeniería – Universidad de la República, Uruguay), orientado a la evaluación de plataformas de *Architecture Knowledge Management (AKM)* y al uso de herramientas para gestionar conocimiento arquitectónico.
+Este repositorio documenta la arquitectura del sistema VÜS E-commerce, modelada con **Structurizr Lite** siguiendo el enfoque *Architecture as Code*.
 
 ---
 
-## 🌍 Visión general del sistema
+## Visión general del sistema
 
 **VÜS** es una marca de indumentaria que busca consolidar su presencia online mediante una plataforma moderna, escalable y visualmente cuidada.  
 El sistema combina un **frontend Angular** con un **backend NodeJS + Express**, utilizando **MongoDB (con Mongoose)** para la persistencia y **Google Cloud Storage (GCS)** para alojar las imágenes de los productos.  
 Todo el proyecto busca mantener una arquitectura limpia, modular y fácilmente extensible, adoptando buenas prácticas tanto de diseño como de despliegue.
 
-### 🔹 Objetivos del sistema
-- Ofrecer una experiencia de compra fluida, intuitiva y visualmente atractiva.
-- Permitir la administración y actualización dinámica del catálogo de productos.
-- Escalar horizontalmente según la demanda, sin pérdida de rendimiento.
+### Objetivos del sistema
+- Ofrecer una experiencia fluida, intuitiva y visualmente atractiva.
 - Mantener independencia entre los componentes de frontend, backend y almacenamiento.
 
 ---
 
-## 🧩 Arquitectura y tecnologías principales
+## Arquitectura y tecnologías principales
 
 | Capa | Tecnología | Descripción |
 |------|-------------|-------------|
@@ -31,14 +28,11 @@ Todo el proyecto busca mantener una arquitectura limpia, modular y fácilmente e
 
 ---
 
-## 🧠 Modelado con Structurizr Lite
+## Modelado con Structurizr Lite
 
 Este repositorio utiliza **Structurizr Lite** para representar la arquitectura mediante el modelo **C4** y sus vistas.
 
 ### Diagramas incluidos
 - **System Context View** → muestra la interacción del usuario con el sistema VÜS.  
 - **Container View** → representa los contenedores principales: frontend, backend, base de datos y almacenamiento.  
-- **Component View** *(en desarrollo)* → describe la estructura interna del backend (controladores, servicios, modelos).  
-
-### Contenido
-
+- **Component View** *(en desarrollo)* → describe la estructura interna del backend (controladores, servicios, modelos).
