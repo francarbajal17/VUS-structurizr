@@ -5,12 +5,30 @@
   "description" : "Arquitectura general del sistema web de VÜS",
   "documentation" : {
     "decisions" : [ {
-      "content" : "# ADR 0001 - Elección del framework frontend\n## Status\nAccepted\n\nDate: 2023-10-20\n\n**Context:** Se eval­uaron diferentes frameworks para construir la interfaz web de nuestro proyecto.\n\n**Considered Alternatives:**\n- React\n- Vue.js\n\n**Decision:** Se selecciona Angular debido a su soporte nativo para SSR, tipado fuerte y ecosistema maduro.\n \n**Consequences:** Aumenta la curva de aprendizaje inicial, pero mejora la mantenibilidad y escalabilidad del proyecto.\n",
-      "date" : "2023-10-20T00:00:00Z",
+      "content" : "# ADR 0001 - Elección del framework frontend\n## Status\nAccepted\n\n**Context:** Se eval­uaron diferentes frameworks para construir la interfaz web de nuestro proyecto.\n\n**Considered Alternatives:**\n- React\n- Vue.js\n\n**Decision:** Se selecciona Angular debido a su soporte nativo para SSR, tipado fuerte y ecosistema maduro.\n \n**Consequences:** Aumenta la curva de aprendizaje inicial, pero mejora la mantenibilidad y escalabilidad del proyecto.\n\n**Related Decisions**:\n- [ADR 0002: Elección del framework backend](#2)",
+      "date" : "2025-11-05T17:22:27Z",
       "format" : "Markdown",
       "id" : "1",
+      "links" : [ {
+        "description" : "-",
+        "id" : "2"
+      } ],
       "status" : "Accepted",
       "title" : " ADR 0001 - Elección del framework frontend"
+    }, {
+      "content" : "# ADR 0002 - Elección del framework backend\n## Status\nAccepted\n\nDate: 2023-10-20\n\n**Context:** Se evaluaron distintas tecnologías y frameworks para implementar el backend del proyecto, considerando aspectos como rendimiento, escalabilidad, compatibilidad con la base de datos y facilidad de integración con el frontend.\n\n**Considered Alternatives:**\n- Django (Python)\n- Spring Boot (Java)\n\n**Decision:** Se selecciona Node.js con Express como framework backend, dado su modelo asíncrono y orientado a eventos, su amplio ecosistema de paquetes NPM y su excelente integración con aplicaciones web modernas basadas en JavaScript.\n \n**Consequences:** Requiere una configuración inicial más detallada y una correcta gestión de asincronía, pero permite un desarrollo ágil, reutilización de código entre frontend y backend, y una arquitectura más ligera y escalable.",
+      "date" : "2023-10-20T00:00:00Z",
+      "format" : "Markdown",
+      "id" : "2",
+      "status" : "Accepted",
+      "title" : " ADR 0002 - Elección del framework backend"
+    }, {
+      "content" : "# ADR 0003 - Elección de la base de datos\n## Status\nAccepted\n\nDate: 2023-10-20\n\n**Context:** Se evaluaron distintas tecnologías y frameworks para implementar el backend del proyecto, considerando aspectos como rendimiento, escalabilidad, compatibilidad con la base de datos y facilidad de integración con el frontend.\n\n**Considered Alternatives:**\n- Django (Python)\n- Spring Boot (Java)\n\n**Decision:** Se selecciona Node.js con Express como framework backend, dado su modelo asíncrono y orientado a eventos, su amplio ecosistema de paquetes NPM y su excelente integración con aplicaciones web modernas basadas en JavaScript.\n \n**Consequences:** Requiere una configuración inicial más detallada y una correcta gestión de asincronía, pero permite un desarrollo ágil, reutilización de código entre frontend y backend, y una arquitectura más ligera y escalable.",
+      "date" : "2023-10-20T00:00:00Z",
+      "format" : "Markdown",
+      "id" : "3",
+      "status" : "Accepted",
+      "title" : " ADR 0003 - Elección de la base de datos"
     } ],
     "sections" : [ {
       "content" : "# VÜS E-commerce\n\n## Visión general\nEl sistema VÜS E-commerce es la plataforma web de venta de indumentaria de la marca VÜS. Permite a los usuarios navegar por catálogos de productos, registrarse, iniciar sesión, comprar productos, y ver sus pedidos.\n\n## Contexto del negocio\n• Marca VÜS con presencia online y física.\n• Objetivo: ampliar canal online, ofrecer catálogo actualizado con imágenes de productos, escalabilidad ante picos de tráfico.\n• Usuario objetivo: consumidor final de indumentaria, espera experiencia rápida, intuitiva, y disponibilidad 24×7.\n\n## Arquitectura de alto nivel\nEl sistema está compuesto por:\n- Frontend desarrollado en Angular (SPA).\n- Backend en NodeJS + Express, expone API REST.\n- Base de datos MongoDB (con Mongoose) para productos, usuarios, pedidos.\n- Almacenamiento de imágenes en Google Cloud Storage (GCS) para productos.\nLuego de iniciar sesión, el usuario envía solicitudes al backend, que accede a la base de datos y al almacenamiento de imágenes, tal como se muestra en el diagrama de contenedores.\n\n## Decisiones arquitectónicas\nLas decisiones clave están documentadas en los ADRs (Architecture Decision Records). Véase carpeta `decisions/` para Angular vs React, MongoDB+Mongoose, GCS, etc.\n\n## Tecnologías & criterios de calidad\n- Angular 20 / TypeScript para frontend.\n- NodeJS 18 + Express para backend.\n- MongoDB 6.x + Mongoose para ODM.\n- Google Cloud Storage para activos multimedia.\n**Criterios:**\n  - Escalabilidad horizontal (uso de MongoDB, almacenamiento en la nube).\n  - Mantenibilidad (estructura modular, código TypeScript).\n  - Rendimiento (uso de CDN, almacenamiento externo de imágenes).\n  - Seguridad (autenticación JWT, HTTPS, control de acceso a buckets).\n\n## Dependencias externas\n- Servicio de pago/ordenes externas (por definir).\n- Google Cloud Platform para almacenamiento y posiblemente hosting.\n- CRM o sistema de inventario físico (sincronización futura).\n\n## Operaciones / despliegue\n- Entornos: **dev**, **staging**, **prod**.\n- Despliegue en contenedores (Docker) o Kubernetes (planificado).\n- Backup de MongoDB diario, replicación geo-regional.\n- Monitoreo con métricas de respuesta del API, tasa de errores, latencia de almacenamiento de objetos.\n\n## Modelo C4 y diagramas\n- System Context: usuarios, sistema VÜS E-commerce.\n- Container: frontend, backend, base de datos, almacenamiento de imágenes.\n- Component: en backend los módulos de controladores, servicios, modelos (Mongoose).\nLos diagramas están disponibles en Structurizr Lite, o exportables en SVG/PNG.\n\n## Contribuir / mantenimiento\n- El repositorio contiene:\n  - `workspace.dsl`: definición del modelo + vistas.\n  - Carpeta `docs/`: documentación Markdown.\n  - Carpeta `decisions/`: ADRs en Markdown.\n- Para contribuir: editá la documentación o los diagramas, guardá, refrescá en Structurizr Lite y confirma que se visualiza correctamente.\n- Las decisiones arquitectónicas deben documentarse creando un nuevo archivo ADR numerado secuencialmente en `decisions/`.\n\n",
@@ -21,7 +39,7 @@
     } ]
   },
   "id" : 1,
-  "lastModifiedDate" : "2025-11-01T20:58:12Z",
+  "lastModifiedDate" : "2025-11-05T17:22:27Z",
   "model" : {
     "people" : [ {
       "description" : "Cliente que navega el sitio y realiza compras online.",
